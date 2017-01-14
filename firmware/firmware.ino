@@ -15,7 +15,7 @@
  * Author: Malcolm Watt
  */
 
-#include<SPI.h>
+#include <SPI.h>
 #include <ros.h>
 #include <std_msgs/Float32.h>
 
@@ -77,7 +77,7 @@ void loop()
  * Initialize the SPI transaction.
  */
 void initialize_transaction()
-{
+{ 
   SPI.beginTransaction (SPISettings (DATA_RATE, MSBFIRST, SPI_MODE0));
   digitalWrite(CHIP_SEL_PIN, LOW);
 }
