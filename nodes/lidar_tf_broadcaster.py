@@ -17,7 +17,7 @@ def handle_platform_angle(msg):
     t = TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "scan"
+    t.header.frame_id = "lidar_mount"
     t.child_frame_id = "axel"
 
     #  Convert the angle from the encoder into a quaternion and assign to t.

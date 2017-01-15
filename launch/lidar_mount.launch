@@ -1,0 +1,21 @@
+<launch>
+  <!-- TF broadcasters. -->
+  <node pkg="lidar_mount" type="lidar_tf_broadcaster.py" 
+        name="lidar_broadcaster" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="axel_broadcaster" args="0 0 0.02 0 0 0 world axel" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="beam_broadcaster" args="0 0 0.1 0 0 0 lidar_mount laser" />
+
+  <!-- Lidar aquisition. -->
+  <node pkg="urg_node" type="urg_node" name="urg_node">
+    <param name="port" type="string" value="/dev/lidar" />
+    <param name="intensity" type="bool" value="true" />
+  </node>
+
+  <!-- Laser assembler. -->
+  <node type="laser_scan_assembler" pkg="laser_assembler" name="assembler">
+    <param name="max_scans" type="int" value="100" />
+    <param name="fixed_frame" type="string" value="axel" />
+  </node>
+</launch>
