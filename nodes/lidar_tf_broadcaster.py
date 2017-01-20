@@ -2,6 +2,7 @@
 import rospy
 import tf
 import tf2_ros
+import math
 from geometry_msgs.msg import TransformStamped
 from std_msgs.msg import Float32
 
@@ -19,9 +20,12 @@ def handle_platform_angle(msg):
     t.header.stamp = rospy.Time.now()
     t.header.frame_id = "lidar_mount"
     t.child_frame_id = "axel"
+    
+    # Convert angle of encoder from 4096th of a rotation to radians.
+    tilt = msg.data * 2.0 * math.pi / 4096
 
     #  Convert the angle from the encoder into a quaternion and assign to t.
-    quat = tf.transformations.quaternion_from_euler(0, msg.data, 0)
+    quat = tf.transformations.quaternion_from_euler(0, tilt, 0)
     t.transform.rotation.x = quat[0]
     t.transform.rotation.y = quat[1]
     t.transform.rotation.z = quat[2]

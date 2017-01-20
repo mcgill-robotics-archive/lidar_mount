@@ -182,7 +182,7 @@ float read_encoder()
   bit_angle = bit_angle + (unsigned int) read_value;
 
   // Convert to degrees.
-  float angle = (float) bit_angle * 360 / 4096;
+  float angle = (float) bit_angle;
 
   end_transaction();
 
