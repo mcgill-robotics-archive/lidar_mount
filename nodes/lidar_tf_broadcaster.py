@@ -18,8 +18,8 @@ def handle_platform_angle(msg):
     t = TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "lidar_mount"
-    t.child_frame_id = "axel"
+    t.header.frame_id = "axel"
+    t.child_frame_id = "lidar_mount"
     
     # Convert angle of encoder from 4096th of a rotation to radians.
     tilt = msg.data * 2.0 * math.pi / 4096

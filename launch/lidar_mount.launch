@@ -3,9 +3,11 @@
   <node pkg="lidar_mount" type="lidar_tf_broadcaster.py" 
         name="lidar_broadcaster" />
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="axel_broadcaster" args="0 0 0.02 0 0 0 world axel" />
+        name="axel_broadcaster" args="0 0 0.02 0 0 0 base_link axel" />
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="beam_broadcaster" args="0 0 0.1 0 0 0 lidar_mount laser" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="world_broadcaster" args="0 0 0 0 0 0 world base_link" />
 
   <!-- Lidar aquisition. -->
   <node pkg="urg_node" type="urg_node" name="urg_node">
@@ -16,6 +18,6 @@
   <!-- Laser assembler. -->
   <node type="laser_scan_assembler" pkg="laser_assembler" name="assembler">
     <param name="max_scans" type="int" value="100" />
-    <param name="fixed_frame" type="string" value="axel" />
+    <param name="fixed_frame" type="string" value="base_link" />
   </node>
 </launch>
