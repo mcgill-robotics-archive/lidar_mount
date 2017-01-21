@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+"""Tf broadcaster for lidar mount."""
+
 import rospy
 import tf
 import tf2_ros
@@ -6,21 +9,21 @@ import math
 from geometry_msgs.msg import TransformStamped
 from std_msgs.msg import Float32
 
-AXEL_HEIGHT = 0.02 #  Approximate height of the rotational axis.
-BEAM_HEIGHT = 0.10 #  Approximate height of the laser.
+AXEL_HEIGHT = 0.02  # Approximate height of the rotational axis.
+BEAM_HEIGHT = 0.05  # Approximate height of the laser.
 
 
 def handle_platform_angle(msg):
-    #  Initialize the broadcaster.
+    """Transform the angle received from encoders into TF."""
     br = tf2_ros.TransformBroadcaster()
-    
+
     #  Create and initialize the tf message.
     t = TransformStamped()
 
     t.header.stamp = rospy.Time.now()
     t.header.frame_id = "axel"
     t.child_frame_id = "lidar_mount"
-    
+
     # Convert angle of encoder from 4096th of a rotation to radians.
     tilt = msg.data * 2.0 * math.pi / 4096
 
@@ -30,7 +33,7 @@ def handle_platform_angle(msg):
     t.transform.rotation.y = quat[1]
     t.transform.rotation.z = quat[2]
     t.transform.rotation.w = quat[3]
-    
+
     #  Broadcast the transform.
     br.sendTransform(t)
 
@@ -40,6 +43,6 @@ if __name__ == '__main__':
 
     #  Register encoder angle handler.
     rospy.Subscriber('lidar_mount_angle', Float32, handle_platform_angle)
-    
+
     #  Spin forever.
     rospy.spin()
