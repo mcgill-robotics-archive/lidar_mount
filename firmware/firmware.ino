@@ -7,17 +7,24 @@
  * can be found at: http://www.cui.com/product/resource/amt20-v.pdf
  * 
  * Circuit:
- ** CSB : pin 10 (slave select)
- ** MOSI: pin 11 
- ** MISO: pin 12
- ** SCK : pin 13 (spi clock)
+ ** Signal : Arduino pin -- Encoder pin [ Description of Sig ]
+ *  ------ | ----------- || ----------- | ------------------
+ ** CSB    : pin 10      -- pin 2       [ Slave Select ]
+ ** MISO   : pin 12      -- pin 3       [ Master in Slave out ]
+ ** GND    : GND pin     -- pin 4
+ ** SCK    : pin 13      -- pin 5       [ SPI Clock ]
+ ** +5V    : 5 V pin     -- pin 6
+ ** MOSI   : pin 11      -- pin 7       [ Master out Slave in ]
  * 
  * Author: Malcolm Watt
  */
 
-#include <SPI.h>
 #include <ros.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Int32.h>
+
+#include <SPI.h>
+#include <Servo.h>
 
 // Slave select pin.
 const int CHIP_SEL_PIN = 10;
@@ -31,31 +38,53 @@ const byte RD_POS = 0x10;
 const byte SET_ZERO = 0x70;
 const byte IDLE_CHAR = 0xA5;
 
+// Servo pin.
+const int SERVO_PIN = 6;
+
+// Create the servo object.
+Servo mount_servo;
+
 // This boolean is used to signal whether or not we are reading.
 // If we want to use the SPI bus to initialize, we need to set this to false.
 bool g_reading = true;
+
+int mount_angle = 90;
 
 ros::NodeHandle nh;
 
 std_msgs::Float32 lidar_angle;
 ros::Publisher lidar_mount("lidar_mount_angle", &lidar_angle);
 
+
+void move_lidar_mount (const std_msgs::Int32& angle){
+  mount_angle = angle.data;
+  delay(1);
+}
+
+ros::Subscriber<std_msgs::Int32> sub("move_lidar", &move_lidar_mount);
+
+
 void setup() 
 {
+  // Setup the ROS node.
+  nh.initNode();
+  nh.advertise(lidar_mount);
+  nh.subscribe(sub);
+
   // Start the SPI library.
   SPI.begin();
+
+  // Set up the servo.
+  mount_servo.attach(SERVO_PIN);
 
   // Setup the chip select pin.
   pinMode(CHIP_SEL_PIN, OUTPUT);
 
-  // Setup the ROS node.
-  nh.initNode();
-  nh.advertise(lidar_mount);
-
   // Allow time for initialization.
   delay(100);
-  
+
   set_zero_point();
+  
   delay(20);
 }
 
@@ -70,6 +99,10 @@ void loop()
     lidar_mount.publish(&lidar_angle);
     nh.spinOnce();
   }
+
+  mount_servo.write(mount_angle);
+  
+  nh.spinOnce();
   delay(1);
 }
 
@@ -113,6 +146,7 @@ void nop_a5()
 {
   initialize_transaction();
   SPI.transfer(NOP_A5);
+  release_ss();
   end_transaction();
 }
 
@@ -121,7 +155,6 @@ void nop_a5()
  */
 void set_zero_point()
 {
-  unsigned int count = 0;
   initialize_transaction();
 
   // Transfer the set_zero_point command.
@@ -132,8 +165,9 @@ void set_zero_point()
   {
     release_ss();
     ack = SPI.transfer(NOP_A5);
-    count++;
   }
+
+  release_ss();
 
   end_transaction();
 }
@@ -183,7 +217,7 @@ float read_encoder()
 
   // Convert to degrees.
   float angle = (float) bit_angle;
-
+  release_ss();
   end_transaction();
 
   return angle;
