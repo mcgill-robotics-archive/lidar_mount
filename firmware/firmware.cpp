@@ -23,6 +23,8 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
 
+#include <Arduino.h>
+
 #include <SPI.h>
 #include <Servo.h>
 
@@ -53,7 +55,7 @@ int mount_angle = 90;
 ros::NodeHandle nh;
 
 std_msgs::Float32 lidar_angle;
-ros::Publisher lidar_mount("lidar_mount_angle", &lidar_angle);
+ros::Publisher lidar_mount("/lidar/encoder_angle", &lidar_angle);
 
 
 void move_lidar_mount (const std_msgs::Int32& angle){
@@ -61,7 +63,14 @@ void move_lidar_mount (const std_msgs::Int32& angle){
   delay(1);
 }
 
-ros::Subscriber<std_msgs::Int32> sub("move_lidar", &move_lidar_mount);
+ros::Subscriber<std_msgs::Int32> sub("/lidar/set_servo", &move_lidar_mount);
+
+void initialize_transaction();
+void end_transaction();
+void release_ss();
+void nop_a5();
+void set_zero_point();
+float read_encoder();
 
 
 void setup() 
@@ -111,7 +120,6 @@ void loop()
  */
 void initialize_transaction()
 { 
-  SPI.beginTransaction (SPISettings (DATA_RATE, MSBFIRST, SPI_MODE0));
   digitalWrite(CHIP_SEL_PIN, LOW);
 }
 
@@ -121,7 +129,6 @@ void initialize_transaction()
 void end_transaction()
 {
   digitalWrite(CHIP_SEL_PIN, HIGH);
-  SPI.endTransaction ();
 }
 
 /*

@@ -1,10 +1,10 @@
 # lidar-mount
 Physical implementation of lidar mount for McGill Robotics.
 
-For now we must build and run the Arduino code independently, as I did not take
-the time to integrate the Arduino <-> catkin toolchain.
-
 ## TODOs
 - Update the README.
-- Update the launch files to include rviz launch.
-- Integrate the Arduino <-> catkin toolchain.
+- Test arduino toolchain actually works.
+- Refactor firmware code into modules
+- Publish straight to TF from firmware
+- Create a scan mode on / off switch in arduino.
+- Write control node for scan.
