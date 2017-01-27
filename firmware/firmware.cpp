@@ -15,10 +15,13 @@ int servo_position = 90;
 
 ros::NodeHandle nh;
 
+std_msgs::Int32 test_angle;
 std_msgs::Float32 lidar_angle;
 ros::Publisher pub_encoder_angle("/lidar/encoder_angle", &lidar_angle);
 ros::Subscriber<std_msgs::Int32> sub_servo_position("/lidar/set_servo",
     &set_servo_position);
+
+LidarController * controller;
 
 void setup()
 {
@@ -27,11 +30,9 @@ void setup()
   nh.advertise(pub_encoder_angle);
   nh.subscribe(sub_servo_position);
 
-  // Start the SPI library.
-  SPI.begin();
+  controller = new LidarController();
 
-  // Set up the servo.
-  servo.attach(SERVO_PIN);
+  SPI.begin();
 
   // Setup the chip select pin.
   pinMode(CHIP_SELECT_PIN, OUTPUT);
@@ -41,29 +42,27 @@ void setup()
 
   set_zero_point();
 
-  delay(20);
+  delay(200);
 }
 
 void loop()
 {
-  if (g_reading)
-  {
-    // Publish the value read from encoder.
-    float angle = read_encoder();
-    lidar_angle.data = angle;
-    pub_encoder_angle.publish(&lidar_angle);
-    nh.spinOnce();
-  }
-
-  servo.write(servo_position);
-
+  // Publish the value read from encoder.
+  float angle = read_encoder();
+  lidar_angle.data = angle;
+  controller->current_encoder_angle = angle * 360 / 4096;
+  pub_encoder_angle.publish(&lidar_angle);
+  nh.spinOnce();
+  delay(1);
+  
+  test_angle.data = controller->goal_angle;
+  test_encoder_angle.publish(&test_angle);
   nh.spinOnce();
   delay(1);
 }
 
 void set_servo_position (const std_msgs::Int32& angle){
-  servo_position = angle.data;
-  delay(1);
+  controller->goal_angle = angle.data + 90;
 }
 
 void initialize_transaction()
