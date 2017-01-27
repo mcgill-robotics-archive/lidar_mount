@@ -8,5 +8,5 @@ include_directories(${ARDUINO_SDK}/hardware/arduino/avr/libraries)
 generate_arduino_firmware(firmware
     SRCS firmware.cpp firmware.h ${ROS_LIB_DIR}/time.cpp
     BOARD uno
-    PORT /dev/ttyUSB-1
+    PORT /dev/redBoard
 )
