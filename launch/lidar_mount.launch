@@ -1,6 +1,6 @@
 <launch>
   <!-- TF broadcasters. -->
-  <node pkg="lidar_mount" type="lidar_tf_broadcaster.py" 
+  <node pkg="lidar_mount" type="tf_broadcaster.py" 
         name="lidar_broadcaster" />
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="axel_broadcaster" args="0 0 0.02 0 0 0 base_link axel" />
@@ -9,11 +9,19 @@
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="world_broadcaster" args="0 0 0 0 0 0 world base_link" />
 
+  <!-- Rosserial. -->
+  <node pkg="rosserial_python" type="serial_node.py" name="lidar_mount">
+    <param name="_port" type="string" value="/dev/redBoard" />
+    <param name="_baud" type="int" value="57600" />
+  </node>
+
   <!-- Lidar aquisition. -->
+  <!--
   <node pkg="urg_node" type="urg_node" name="urg_node">
     <param name="port" type="string" value="/dev/lidar" />
     <param name="intensity" type="bool" value="true" />
   </node>
+  -->
 
   <!-- Laser assembler. -->
   <node type="laser_scan_assembler" pkg="laser_assembler" name="assembler">
