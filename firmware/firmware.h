@@ -30,16 +30,8 @@
 #include <SPI.h>
 #include <Servo.h>
 
-#include "LidarController.h"
-
 // Arduino pins.
 const int CHIP_SELECT_PIN = 10;
-
-// SPI commands.
-const byte NOP_A5 = 0x00;
-const byte RD_POS = 0x10;
-const byte SET_ZERO = 0x70;
-const byte IDLE_CHAR = 0xA5;
 
 
 /*
