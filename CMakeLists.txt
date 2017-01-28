@@ -11,6 +11,18 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     rosserial_arduino
     rosserial_client
+    message_generation
+)
+
+# Service files.
+add_service_files(
+    FILES
+    LidarScan.srv
+)
+
+generate_messages(
+    DEPENDENCIES
+    std_msgs
 )
 
 catkin_package()
@@ -19,6 +31,7 @@ catkin_package()
 ## Build ##
 ###########
 
+# Arduino config.
 rosserial_generate_ros_lib(
     PACKAGE rosserial_arduino
     SCRIPT make_libraries.py

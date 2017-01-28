@@ -7,59 +7,37 @@
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <maintainer email="malcolm.watt@mail.mcgill.ca">Malcolm Watt</maintainer>
 
-
   <!-- One license tag required, multiple allowed, one license per tag -->
   <license>MIT</license>
 
-
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/lidar_mount</url> -->
-
+  <url type="repository">https://github.com/mcgill-robotics/lidar-3dify</url>
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
   <author email="malcolm.watt@mail.mcgill.ca">Malcolm Watt</author>
 
-  <!-- The *_depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <!-- Examples: -->
-  <!-- Use build_depend for packages you need at compile time: -->
-  <!--   <build_depend>message_generation</build_depend> -->
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
+  <!-- Build dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>tf2</build_depend>
-  <build_depend>tf2_ros</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>roscpp</build_depend>
   <build_depend>rosserial_arduino</build_depend>
   <build_depend>rosserial_client</build_depend>
+  <build_depend>message_generation</build_depend>
 
+  <!-- Run dependencies -->
   <run_depend>rospy</run_depend>
-  <run_depend>rosserial_arduino</run_depend>
+  <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>rosserial_client</run_depend>
-  <run_depend>tf2</run_depend>
-  <run_depend>tf2_ros</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>roscpp</run_depend>
+  <run_depend>rosserial_arduino</run_depend>
   <run_depend>urg_node</run_depend>
   <run_depend>laser_assembler</run_depend>
-  <run_depend>rosserial_arduino</run_depend>
-  <run_depend>rosserial_client</run_depend>
+  <run_depend>message_runtime</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
   </export>
 </package>
