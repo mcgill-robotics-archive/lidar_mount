@@ -5,31 +5,38 @@
  */
 #include "firmware.h"
 
-// SPI commands.
-#define NOP_A5 0x00
-#define RD_POS 0x10
-#define SET_ZERO 0x70
-#define IDLE_CHAR 0xA5
-#define SERVO_PIN 6
+// Arduino pins.
+const int SERVO_PIN = 6;
+const int CHIP_SELECT_PIN = 10;
+
 
 Servo servo;
+bool scan_flag = false;
+bool scan_dir_up = true;
+int pitch_up_lim = 330;
+int pitch_down_lim = 45;
 
 ros::NodeHandle nh;
 
 std_msgs::Float32 lidar_angle;
+
 ros::Publisher pub_encoder_angle("/lidar_mount/encoder_angle", &lidar_angle);
-ros::Subscriber<std_msgs::Int32> sub_servo_position("/lidar_mount/set_servo",
-    &set_servo_position);
+ros::Subscriber<std_msgs::Bool> sub_enable_scan("/lidar_mount/enable_scan",
+    &enable_scan);
+
+AbsoluteEncoder * encoder;
 
 void setup()
 {
   // Setup the ROS node.
   nh.initNode();
   nh.advertise(pub_encoder_angle);
-  nh.subscribe(sub_servo_position);
+  nh.subscribe(sub_enable_scan);
 
   // Test
   SPI.begin();
+
+  encoder = new AbsoluteEncoder(CHIP_SELECT_PIN);
 
   // Setup the chip select pin.
   pinMode(CHIP_SELECT_PIN, OUTPUT);
@@ -38,7 +45,7 @@ void setup()
   // Allow time for initialization.
   delay(100);
 
-  set_zero_point();
+  encoder->set_zero_point();
 
   delay(20);
 }
@@ -46,109 +53,25 @@ void setup()
 void loop()
 {
   // Publish the value read from encoder.
-  float angle = read_encoder();
-
-  lidar_angle.data = angle;
-
+  float angle = encoder->read_encoder();
+  lidar_angle.data = angle * 360 / 4096;
   pub_encoder_angle.publish(&lidar_angle);
   nh.spinOnce();
+
+  int idle = 90;
+  if(scan_flag)
+  {
+    // up corresponds to + speeds.
+    // and titled up corresponds to angles comming down from 360 while down goes up from 0
+  }
+  else
+  {
+    servo.write(idle);
+  }
 
   delay(10);
 }
 
-void set_servo_position (const std_msgs::Int32& angle){
-  servo.write(angle.data + 90);
-  delay(1);
-}
-
-void initialize_transaction()
-{
-  digitalWrite(CHIP_SELECT_PIN, LOW);
-}
-
-void end_transaction()
-{
-  digitalWrite(CHIP_SELECT_PIN, HIGH);
-}
-
-void release_ss()
-{
-  delayMicroseconds(20);
-  digitalWrite(CHIP_SELECT_PIN, HIGH);
-  digitalWrite(CHIP_SELECT_PIN, LOW);
-}
-
-void nop_a5()
-{
-  initialize_transaction();
-  SPI.transfer(NOP_A5);
-  release_ss();
-  end_transaction();
-}
-
-void set_zero_point()
-{
-  initialize_transaction();
-
-  // Transfer the set_zero_point command.
-  byte ack = SPI.transfer(SET_ZERO);
-  // Transfer no_operation command untill we receive 0x80 which
-  // is an acknowledgement that the encoder has been zeroed.
-  while (ack != 0x80)
-  {
-    release_ss();
-    ack = SPI.transfer(NOP_A5);
-  }
-
-  release_ss();
-
-  end_transaction();
-}
-
-float read_encoder()
-{
-  initialize_transaction();
-
-  // To hold transfer values.
-  byte read_value;
-
-  // Transfer the original read position command.
-  read_value = SPI.transfer(RD_POS);
-
-  /*
-   * Transfer until we receive the RD_POS byte back. Based on the
-   * data sheet, when we receive the RD_POS back, the next two bytes
-   * contain the angle of the encoder.
-   */
-  while (read_value != RD_POS)
-  {
-    release_ss();
-    read_value = SPI.transfer(NOP_A5);
-  }
-
-  /*
-   * Based on the datasheet:
-   * 1 -  send nop_a5 and receive MSB position (lower 4 bits of this byte are
-   *      the upper 4 of the 12-bit position)
-   * 2 -  Send second nop_a5 command and receive LSB position (lower 8 bits of
-   *      12-bit positon)
-   */
-  release_ss();
-  read_value = SPI.transfer(NOP_A5);
-
-  unsigned int bit_angle = 0;
-
-  bit_angle = (unsigned int)(read_value & 0x0F) * 256;
-
-  release_ss();
-  read_value = SPI.transfer(NOP_A5);
-
-  bit_angle = bit_angle + (unsigned int) read_value;
-
-  // Convert to degrees.
-  float angle = (float) bit_angle;
-  release_ss();
-  end_transaction();
-
-  return angle;
+void enable_scan (const std_msgs::Bool& scan){
+  scan_flag = scan.data;
 }
