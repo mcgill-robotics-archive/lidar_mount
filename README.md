@@ -25,17 +25,19 @@ what they're doing before messing around with this.**
 - In the catkin_ws directory, issue the command 
 ```bash
 catkin_make
-``` to build.
+``` 
+to build.
 - Still in that directory, issue the command 
 ```bash
 catkin_make lidar_mount_firmware_firmware-upload
-```.
+```
 
 ## Running and viewing in RVIZ
 - To run, simply issue
 ```bash
 roslaunch lidar_mount lidar_mount.launch
-``` to get all the core processes going.
+``` 
+to get all the core processes going.
 - To get rviz running, from the `catkin_ws` (or anywhere you just have to
 update the path) issue
 ```bash
