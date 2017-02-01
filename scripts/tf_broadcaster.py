@@ -36,13 +36,15 @@ def handle_platform_angle(msg):
 
     #  Broadcast the transform.
     br.sendTransform(t)
+    rospy.logdebug("Published to tf.")
 
 
 if __name__ == '__main__':
     rospy.init_node('lidar_tf_broadcaster')
 
     #  Register encoder angle handler.
-    rospy.Subscriber('lidar_mount_angle', Float32, handle_platform_angle)
+    topic_name = '/lidar_mount/encoder_angle'
+    rospy.Subscriber(topic_name, Float32, handle_platform_angle)
 
     #  Spin forever.
     rospy.spin()

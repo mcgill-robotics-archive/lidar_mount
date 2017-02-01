@@ -11,7 +11,7 @@ if __name__ == '__main__':
     rospy.wait_for_service("assemble_scans")
 
     while True:
-        r = rospy.Rate(20)
+        r = rospy.Rate(1)
         pub = rospy.Publisher('lidar_pc_pub', PointCloud, queue_size=5)
         try:
             scanner_srv = rospy.ServiceProxy('assemble_scans', AssembleScans)
@@ -19,3 +19,4 @@ if __name__ == '__main__':
             pub.publish(resp.cloud)
         except KeyboardInterrupt as er:
             break
+        r.sleep()
