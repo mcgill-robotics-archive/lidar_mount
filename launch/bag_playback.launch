@@ -1,0 +1,9 @@
+<launch>
+  <!-- TF broadcasters. -->
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="axel_broadcaster" args="0 0 0.02 0 0 0 base_link axel" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="beam_broadcaster" args="0 0 0.1 0 0 0 lidar_mount laser" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="world_broadcaster" args="0 0 0 0 0 0 world base_link" />
+</launch>
