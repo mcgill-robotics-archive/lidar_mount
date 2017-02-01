@@ -19,9 +19,9 @@ int pitch_down_lim = 45;
 
 ros::NodeHandle nh;
 
-std_msgs::Float32 lidar_angle;
 std_msgs::Int32 test;
-ros::Publisher pub_encoder_angle("/lidar_mount/encoder_angle", &lidar_angle);
+// ros::Publisher pub_encoder_angle("/lidar_mount/encoder_angle", &lidar_angle);
+tf::TransformBroadcaster br;
 ros::Subscriber<std_msgs::Bool> sub_enable_scan("/lidar_mount/enable_scan",
     &enable_scan);
 
@@ -33,7 +33,7 @@ void setup()
 {
   // Setup the ROS node.
   nh.initNode();
-  nh.advertise(pub_encoder_angle);
+  br.init(nh);
   nh.subscribe(sub_enable_scan);
   nh.advertise(test_pub);
 
@@ -56,13 +56,31 @@ void setup()
 
 void loop()
 {
-  // Publish the value read from encoder.
-  float angle = encoder->read_encoder();
-  float angle_deg = angle * 360 / 4096;
-  lidar_angle.data = angle;
-  pub_encoder_angle.publish(&lidar_angle);
+  // Transform and braodcast the value read from encoder.
+  float encoded_angle = encoder->read_encoder();
+  float angle_deg = encoded_angle * 360 / 4096;
+  float tilt = angle_deg * 2.0 * M_PI / 4096;
+
+  geometry_msgs::TransformStamped t;
+
+  t.header.stamp = nh.now();
+  t.header.frame_id = "axel";
+  t.child_frame_id = "lidar_mount";
+
+  geometry_msgs::Quaternion q;
+  q = tf::createQuaternionFromYaw(tilt);
+
+  t.transform.rotation.x = q.x;
+  t.transform.rotation.y = q.z; // Swapped because our
+  t.transform.rotation.z = q.y; // angle is pitch, not yaw
+  t.transform.rotation.w = q.w;
+
+  br.sendTransform(t);
+
+//  pub_encoder_angle.publish(&lidar_angle);
+
   nh.spinOnce();
-    
+
   int motor_speed;
 
   int idle = 90;
