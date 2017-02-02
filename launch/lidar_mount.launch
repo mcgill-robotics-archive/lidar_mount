@@ -19,12 +19,10 @@
   <node pkg="lidar_mount" type="laser_scanner.py" name="laser_scanner"></node>
 
   <!-- Lidar aquisition. -->
-  <!--
   <node pkg="urg_node" type="urg_node" name="urg_node">
     <param name="port" type="string" value="/dev/lidar" />
     <param name="intensity" type="bool" value="true" />
   </node>
-  -->
 
   <!-- Laser assembler. -->
   <node type="laser_scan_assembler" pkg="laser_assembler" name="assembler">
