@@ -19,7 +19,7 @@ int pitch_down_lim = 45;
 
 ros::NodeHandle nh;
 
-std_msgs::Int32 test;
+std_msgs::String test;
 ros::Subscriber<std_msgs::Bool> sub_enable_scan("/lidar_mount/enable_scan",
     &enable_scan);
 
@@ -39,7 +39,7 @@ void setup()
   SPI.begin();
 
   encoder = new AbsoluteEncoder(CHIP_SELECT_PIN);
-  broadcaster = new LidarTfBroadcaster(nh);
+  broadcaster = new LidarTfBroadcaster(&nh);
 
   // Setup the chip select pin.
   pinMode(CHIP_SELECT_PIN, OUTPUT);
@@ -57,10 +57,9 @@ void loop()
 {
   // Transform and braodcast the value read from encoder.
   float encoded_angle = encoder->read_encoder();
-  float angle_deg = encoded_angle * 360 / 4096;
-  float tilt = angle_deg * 2.0 * M_PI / 4096;
+  float tilt = encoded_angle * 2.0 * M_PI / 4096;
 
-  broadcaster->broadcast_transform_from_tilt(tilt);
+//  broadcaster->broadcast_transform_from_tilt(tilt);
 
   nh.spinOnce();
 
@@ -71,12 +70,12 @@ void loop()
   {
     // and titled up corresponds to angles comming down from 360 while down goes up from 0
     // Check limiting conditions and reverse direction of speed if met.
-    if(scan_dir_up && angle_deg < 330 && angle_deg > 180)
+    if(scan_dir_up && tilt < 330 && tilt > 180)
     {
       scan_dir_up = false;
       servo_speed = -10;
     }
-    else if (!scan_dir_up && angle_deg > 30 && angle_deg < 180)
+    else if (!scan_dir_up && tilt > 30 && tilt < 180)
     {
       scan_dir_up = true;
       servo_speed = 10;
@@ -91,7 +90,7 @@ void loop()
 
   servo.write(motor_speed);
   
-  test.data = motor_speed;
+  test.data = "End of Loop.";
   test_pub.publish(&test);
 
   delay(10);

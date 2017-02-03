@@ -3,6 +3,7 @@ project(lidar_mount)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
+    tf
     tf2
     tf2_ros
     rospy

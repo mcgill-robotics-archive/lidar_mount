@@ -12,7 +12,7 @@
 class LidarTfBroadcaster
 {
 public:
-  LidarTfBroadcaster(ros::NodeHandle node_handle);
+  LidarTfBroadcaster(ros::NodeHandle * node_handle);
   
   /*
    * Broadcast tf transform of the lidar from the value
@@ -20,7 +20,7 @@ public:
    */
   void broadcast_transform_from_tilt(float tilt);
 private:
-	ros::NodeHandle nh; // Required for nh.now()
+	ros::NodeHandle * nh_; // Required for nh.now()
 	tf::TransformBroadcaster br;
 };
 
