@@ -9,11 +9,13 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
+#include <lidar_mount/LidarScan.h>
 
 #include <Arduino.h>
 #include <Servo.h>
 
 #include "AbsoluteEncoder.h"
+#include "ScanController.h"
 
 /*
  * Servo position intermediate method.
