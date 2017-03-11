@@ -1,5 +1,8 @@
 <launch>
-  
+  <!-- Define arguments. -->
+  <arg name="bag_playback" default="false" />
+  <arg name="viz" default="false" />
+
   <!-- Nodes required for running the physical implementation. -->
   <group unless="$(arg bag_playback)">
     <!-- Rosserial. -->
@@ -28,18 +31,23 @@
           name="lidar_broadcaster" />
   </group>
 
-
-  <!-- Static TFs required for both running and for bag playback. -->
+  <!-- Static frame between base_link and world for testing purposes. -->
+  <group if="$(arg bag_playback)">
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="axel_broadcaster" args="0 0 0.02 0 0 0 lidar_mount/base_link 
+        name="world_broadcaster" args="0 0 0 0 0 0 world
+        base_link" />
+  </group>
+  
+  <!-- Static TFs required for both regular opperation and for bag playback. -->
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="base_broadcaster" args="0 0 0 0 0 0 base_link
+        lidar_mount/base" />
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="axel_broadcaster" args="0 0 0.02 0 0 0 lidar_mount/base 
         lidar_mount/axel" />
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="beam_broadcaster" args="0 0 0.1 0 0 0 lidar_mount/platform
         lidar_mount/laser" />
-  <node pkg="tf2_ros" type="static_transform_publisher"
-        name="world_broadcaster" args="0 0 0 0 0 0 world
-        lidar_mount/base_link" />
-
 
   <!-- RVIZ. -->
   <group if="$(arg viz)">
